@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>CORSテスト</title>
+	<meta charset="utf-8" />
+</head>
+<body>
+
+
+    <script src="../Scripts/jquery-3.1.1.js"></script>
+    <script>
+        var url = "http://localhost:50041/api/values";
+        $.get(url, function (data) {
+            console.log("通常");
+            console.log("succeed.");
+            console.log(data);
+        }).fail(function (xhr, status, text) {
+            console.log("通常");
+            console.log("fail.");
+            console.log(status);
+        });
+
+        var url = "http://localhost:50041/api/values/another";
+        $.get(url, function (data) {
+            console.log("ルート");
+            console.log("succeed.");
+            console.log(data);
+        }).fail(function (xhr, status, text) {
+            console.log("ルート");
+            console.log("fail.");
+            console.log(status);
+        });
+
+        var accessToken = "";
+        var url = "http://localhost:50041/Token";
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: {
+                grant_type: 'password',
+                username: 'admin',
+                password: 'admin',
+            },
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            // dataType: 'json',
+            success: function (data) {
+                console.log("認証成功");
+                console.info(data.access_token);
+                accessToken = data.access_token;
+
+                var url = "http://localhost:50041/api/values/authorize";
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    headers: {
+                        "Authorization": "Bearer " + accessToken,
+                    },
+                    // dataType: 'json',
+
+                    success: function (data) {
+                        console.log("認証(認証あり)");
+                        console.log("succeed.");
+                        console.log(data);
+                    }, error: function (xhr, status, text) {
+                        console.log("認証(認証あり)");
+                        console.log("fail.");
+                        console.log(status + ":" + text);
+                    }
+                });
+
+            },
+            error: function (xhr, status, text) {
+                console.log("認証失敗");
+                console.log(status + ":" + text);
+            }
+        });
+
+        var url = "http://localhost:50041/api/values/authorize";
+        $.get(url, function (data) {
+            console.log("認証(認証なし)");
+            console.log("succeed.");
+            console.log(data);
+        }).fail(function (xhr, status, text) {
+            console.log("認証(認証なし)");
+            console.log("fail.");
+            console.log(status + ":" + text);
+        });
+
+    </script>
+</body>
+</html>
